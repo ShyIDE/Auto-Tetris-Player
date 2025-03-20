@@ -85,29 +85,27 @@ def detect_board(img):
 
     return board
 
+# **🧠 Find Best Move (NEW LOGIC)**
 def find_best_move(board):
     """
-    Finds the best move by filling rows from left to right.
-    Moves to the next row ONLY when the current row is completely full.
+    ✅ Finds the best move by scanning each row and column in order.
+    ✅ Places blocks left-to-right in a row before moving up.
     """
     for row in range(19, -1, -1):  # Start from bottom row (19) and move up
-        empty_cols = np.where(board[row, :] == 0)[0]  # Find empty columns in the current row
-        
-        # Check if the previous row still has empty spaces
-        if row < 19 and np.any(board[row + 1, :] == 0):  
-            print(f"⚠️ Previous Row {row+1} still has empty spaces! Staying in Row {row+1}", flush=True)
-            continue  # Stay in the previous row to finish filling
+        for col in range(10):  # Loop through all columns left to right
+            if board[row, col] == 0:  # If the space is empty
+                # Check if the row below still has gaps
+                if row < 19 and np.any(board[row + 1, :] == 0):  
+                    print(f"⚠️ Row {row+1} still has empty spaces! Filling that first.", flush=True)
+                    continue  # Stay in the lower row until full
+                
+                print(f"🟢 Placing block in Row {row}, Column {col}", flush=True)
+                return col  # Return the first empty space found
 
-        # Place in the first available empty column in the current row
-        if len(empty_cols) > 0:
-            target_col = empty_cols[0]  # Pick the first empty column from left to right
-            print(f"🟢 Placing block in Row {row}, Column {target_col}", flush=True)
-            return target_col  # Return the correct column for placement
-
-    # If no valid move found, default to placing in the first available column in row 19
-    print("⚠️ No valid move found, defaulting to the first available column at bottom", flush=True)
+    # **Fallback: Place in the first available column in row 19**
+    print("⚠️ No valid move found, defaulting to bottom row", flush=True)
     first_empty_col = np.where(board[19, :] == 0)[0]
-    return first_empty_col[0] if len(first_empty_col) > 0 else 5  # Default to first empty or center
+    return first_empty_col[0] if len(first_empty_col) > 0 else 5  # Default to center
 
 # **Rotate Piece for Best Fit**
 def rotate_piece():
